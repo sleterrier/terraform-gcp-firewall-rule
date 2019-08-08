@@ -2,6 +2,12 @@
 
 Terraform module :: GCP :: for network firewall rule(s) creation and management
 
+## Compatibility
+
+This module is meant for use with Terraform 0.12. If you haven't
+[upgraded][terraform-0.12-upgrade] and need a Terraform 0.11.x-compatible
+version of this module, you are out of luck!
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |
