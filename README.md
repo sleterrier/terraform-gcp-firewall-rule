@@ -19,7 +19,7 @@ version of this module, you are out of luck!
 ## Usage
 
 ```hcl
-module "iam_binding" {
+module "fw-rules" {
   source = "../modules/gcp-firewall-rule"
 
   network = "network-name"
@@ -68,7 +68,8 @@ module "iam_binding" {
       }
       destination_tags        = [ "dns_server" ]
       direction               = "INGRESS"
-      source_service_accounts = [ "terraform@team1-project1-12345.iam.gserviceaccount.com", "jenkins@team1-project1-12345.iam.gserviceaccount.com" ]
+     source_service_accounts = [ "terraform@team1-project1-12345.iam.gserviceaccount.com",
+                                  "jenkins@team1-project1-12345.iam.gserviceaccount.com" ]
     }
   }
 }
