@@ -26,40 +26,72 @@ module "fw-rules" {
   project = "project-1234"
 
   rules = {
-    "ingress-allow-web-tag-from-cidr-private" = {
-        allow = {
-          "tcp"          = [ "80", "443" ]
-        }
-        destination_tags = [ "web_server" ]
-        direction        = "INGRESS"
-        source_ranges    = [ "10.0.0.0/8" ]
+   "default-egress-deny-all" = {
+      deny = {
+        "icmp" = []
+        "tcp"  = []
+        "udp"  = []
+      }
+      description        = "DEFAULT|EGRESS - DENY all outbound traffic to anywhere"
+      direction          = "EGRESS"
+      priority           = 65500
+      destination_ranges = [ "0.0.0.0/0", ]
     }
 
-    "ingress-deny-imcp-from-cidr-any" = {
-        deny = {
-          "icmp"      = []
-        }
-        direction     = "INGRESS"
-        source_ranges = [ "0.0.0.0/0" ]
+    "default-ingress-deny-from-cidr-gcp" = {
+      deny = {
+        "icmp" = []
+        "tcp"  = []
+        "udp"  = []
+      }
+      description   = "DEFAULT|INGRESS - DENY all incoming traffic from private GCP Subnets"
+      direction     = "INGRESS"
+      priority      = 65490
+      source_ranges = [ "10.200.0.0/15",
+                        "10.140.0.0/16", ]
+    }
+
+    "default-ingress-allow-from-cidr-blizz" = {
+      allow = {
+        "icmp"      = []
+        "tcp"       = [ "22", "3389", ] # SSH, Remote Desktop
+      }
+      description   = "DEFAULT|INGRESS - ALLOW ICMP, ssh and remote desktop incoming traffic from on-prem subnets"
+      direction     = "INGRESS"
+      priority      = 65500
+      source_ranges = [ "10.0.0.0/8",
+                        "192.168.0.0/16", ]
+    }
+
+    "ingress-allow-web-tag-from-cidr-private" = {
+      allow = {
+        "tcp"       = [ "80", "443" ]
+      }
+      direction     = "INGRESS"
+      priority      = 10000
+      source_ranges = [ "10.0.0.0/8" ]
+      target_tags   = [ "web_server" ]
     }
 
     "ingress-allow-ssh-tag-from-tag" = {
-        allow = {
-          "tcp"          = [ "22" ]
-        }
-        destination_tags = [ "ssh_server" ]
-        direction        = "INGRESS"
-        source_tags      = [ "ssh_client" ]
+      allow = {
+        "tcp"     = [ "22" ]
+      }
+      direction   = "INGRESS"
+      priority    = 10000
+      source_tags = [ "ssh_client" ]
+      target_tags = [ "ssh_server" ]
     }
 
     "ingress-allow-dns-tag-from-cidr-any" = {
-        allow = {
-          "tcp"          = [ "53" ]
-          "udp"          = [ "53" ]
-        }
-        destination_tags = [ "dns_server" ]
-        direction        = "INGRESS"
-        source_ranges    = [ "0.0.0.0/0" ]
+      allow = {
+        "tcp"       = [ "53" ]
+        "udp"       = [ "53" ]
+      }
+      direction     = "INGRESS"
+      priority      = 10000
+      source_ranges = [ "0.0.0.0/0" ]
+      target_tags   = [ "dns_server" ]
     }
 
     "ingress-allow-web-tag-from-team1-sas" = {
@@ -68,14 +100,15 @@ module "fw-rules" {
       }
       destination_tags        = [ "dns_server" ]
       direction               = "INGRESS"
-     source_service_accounts = [ "terraform@team1-project1-12345.iam.gserviceaccount.com",
-                                  "jenkins@team1-project1-12345.iam.gserviceaccount.com" ]
+      priority                = 10000
+      source_service_accounts = [ "service-account-1@example-project-12345.iam.gserviceaccount.com",
+                                  "service-account-2@example-project-12345.iam.gserviceaccount.com" ]
     }
   }
 }
 ```
 
-## References
+## Map arguments reference
 
 - https://www.terraform.io/docs/providers/google/r/compute_firewall.html
 
